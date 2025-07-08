@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+"""
+Simple build script for MBR Dashboard executable
+"""
+
+import os
+import sys
+import shutil
+import subprocess
+from datetime import datetime
+
+def clean_build_directories():
+    """Remove old build directories"""
+    dirs_to_remove = ['build', 'dist', '__pycache__']
+    for dir_name in dirs_to_remove:
+        if os.path.exists(dir_name):
+            print(f"🧹 Removing {dir_name}...")
+            shutil.rmtree(dir_name)
+
+def build_executable():
+    """Build the executable using PyInstaller"""
+    print("\n" + "=" * 60)
+    print("MBR Dashboard - Simple Build Script")
+    print("=" * 60)
+    
+    # Clean old builds
+    clean_build_directories()
+    
+    # Run PyInstaller with the simple spec file
+    print(f"\n📦 Building executable using mbr_dashboard_simple.spec...")
+    cmd = [sys.executable, '-m', 'PyInstaller', 'mbr_dashboard_simple.spec', '--clean']
+    
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            print("\n✅ Build successful!")
+            
+            # Copy startup scripts
+            output_dir = "dist/MBR_Dashboard"
+            shutil.copy("start_mbr_dashboard.sh", f"{output_dir}/Start_Dashboard.sh")
+            os.chmod(f"{output_dir}/Start_Dashboard.sh", 0o755)
+            print(f"📄 Copied startup script to {output_dir}/Start_Dashboard.sh")
+            
+            # Create README
+            readme_content = f"""
+MBR Dashboard - ESS Compliance Analysis
+======================================
+
+Developed by Jonathan J and Nitin G
+Built on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+How to Run:
+-----------
+1. Double-click 'Start_Dashboard.sh'
+2. The dashboard will automatically open in your default browser
+3. To stop the server, close the terminal window or press Ctrl+C
+
+Requirements:
+-------------
+- No installation required
+- Works on macOS
+- Internet browser (Chrome, Firefox, Safari, Edge)
+
+Troubleshooting:
+----------------
+- If the dashboard doesn't open automatically, navigate to:
+  http://127.0.0.1:8080
+- Make sure no other application is using port 8080
+- Check firewall settings if you encounter connection issues
+
+"""
+            
+            with open(f'{output_dir}/README.txt', 'w') as f:
+                f.write(readme_content)
+            
+            print(f"\n📦 Package ready for distribution in: {output_dir}/")
+            print("\nTo run the dashboard:")
+            print(f"  1. Navigate to {output_dir}")
+            print(f"  2. Run ./Start_Dashboard.sh")
+            
+        else:
+            print("\n❌ Build failed!")
+            print(f"Error: {result.stderr}")
+            return 1
+            
+    except Exception as e:
+        print(f"\n❌ Build error: {e}")
+        return 1
+    
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(build_executable()) 

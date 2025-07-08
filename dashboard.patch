@@ -1,0 +1,124 @@
+--- templates/dashboard.html.old
++++ templates/dashboard.html
+@@ -5396,42 +5396,41 @@
+-async function fetchTeamDrillDownData(teamName, timePeriod = null) {
+-    const selectedTimePeriod = timePeriod || 
+-                              (document.getElementById("modal-time-period-filter") ? 
+-                               document.getElementById("modal-time-period-filter").value : "all");
+-    
+-    console.log(`Fetching drill-down data for team: "${teamName}" with time period: "${selectedTimePeriod}"`);
+-    
+-    const { quarter, month } = parseTimePeriod(selectedTimePeriod);
+-    const response = await fetch(`/api/team_drill_down?team=${encodeURIComponent(teamName)}&quarter=${quarter}&month=${month}`);
+-    
+-    if (!response.ok) {
+-        const errorText = await response.text();
+-        console.error("API Error:", response.status, errorText);
+-        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+-    }
+-    
+-    const teamData = await response.json();
+-    console.log("Received team data:", teamData);
+-    
+-    showDrillDownNotification("team", teamName);
+-    
+-    verifyDataConsistency(teamName, teamData);
+-    
+-    populateTeamDrillDown(teamData);
+-    
+-    try {
+-    } catch (error) {
+-        console.error("Error fetching team drill-down data:", error);
+-        const modalLoading = document.getElementById("modal-loading");
+-        if (modalLoading) {
+-            modalLoading.innerHTML = `
+-                <div class="text-center py-12">
+-                    <div class="text-red-400 text-xl mb-4">⚠️</div>
+-                    <p style="color: var(--modal-text-secondary);">Failed to load team data for "${teamName}"</p>
+-                    <p class="text-sm mt-2" style="color: var(--modal-text-secondary);">${error.message}</p>
+-                    <button onclick="fetchTeamDrillDownData()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
++async function fetchTeamDrillDownData(teamName, timePeriod = null) {
++    try {
++        const selectedTimePeriod = timePeriod || 
++                                  (document.getElementById("modal-time-period-filter") ? 
++                                   document.getElementById("modal-time-period-filter").value : "all");
++        
++        console.log(`Fetching drill-down data for team: "${teamName}" with time period: "${selectedTimePeriod}"`);
++        
++        const { quarter, month } = parseTimePeriod(selectedTimePeriod);
++        const response = await fetch(`/api/team_drill_down?team=${encodeURIComponent(teamName)}&quarter=${quarter}&month=${month}`);
++        
++        if (!response.ok) {
++            const errorText = await response.text();
++            console.error("API Error:", response.status, errorText);
++            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
++        }
++        
++        const teamData = await response.json();
++        console.log("Received team data:", teamData);
++        
++        showDrillDownNotification("team", teamName);
++        
++        verifyDataConsistency(teamName, teamData);
++        
++        populateTeamDrillDown(teamData);
++    } catch (error) {
++        console.error("Error fetching team drill-down data:", error);
++        const modalLoading = document.getElementById("modal-loading");
++        if (modalLoading) {
++            modalLoading.innerHTML = `
++                <div class="text-center py-12">
++                    <div class="text-red-400 text-xl mb-4">⚠️</div>
++                    <p style="color: var(--modal-text-secondary);">Failed to load team data for "${teamName}"</p>
++                    <p class="text-sm mt-2" style="color: var(--modal-text-secondary);">${error.message}</p>
++                    <button onclick="fetchTeamDrillDownData()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                         Try Again
+                     </button>
+                 </div>
+             `;
+         }
+     }
+@@ -1102,39 +1102,9 @@
+             <div class="text-2xl font-bold mb-2" style="color: var(--modal-text-primary);">SLA Compliance</div>
+             <div class="text-sm mb-4" style="color: var(--modal-text-secondary);">Performance against service level agreements</div>
+-            <div class="grid grid-cols-2 gap-4 text-center">
+-                <div class="rounded-lg p-4" style="background-color: var(--modal-card-bg);">
+-                    <div class="text-lg font-bold text-cyan-300" id="drill-sla-baseline">0%</div>
+-                    <div class="text-xs" style="color: var(--modal-text-secondary);">95.5% Base (4h)</div>
+-                </div>
+-                <div class="rounded-lg p-4" style="background-color: var(--modal-card-bg);">
+-                    <div class="text-lg font-bold text-cyan-300" id="drill-sla-goal">0%</div>
+-                    <div class="text-xs" style="color: var(--modal-text-secondary);">Goal (3h)</div>
+-                </div>
++            <div class="rounded-lg p-4 text-center" style="background-color: var(--modal-card-bg);">
++                <div class="text-lg font-bold text-cyan-300" id="drill-sla-goal">0%</div>
++                <div class="text-xs" style="color: var(--modal-text-secondary);">Goal (3h)</div>
++                <div class="text-sm" style="color: var(--modal-text-secondary);">SLA Compliance</div>
+             </div>
+-            <div class="rounded-lg p-4 mt-4" style="background-color: var(--modal-card-bg); text-align: center;">
+-                <div class="text-sm" style="color: var(--modal-text-secondary);">SLA Compliance</div>
+-                <div class="flex justify-center mt-2">
+-                    <div class="text-center mx-2">
+-                        <div class="text-lg font-bold text-cyan-300" id="drill-sla-baseline">0%</div>
+-                        <div class="text-xs" style="color: var(--modal-text-secondary);">95.5% Base (4h)</div>
+-                    </div>
+-                    <div class="text-center mx-2">
+-                        <div class="text-lg font-bold text-cyan-300" id="drill-sla-goal">0%</div>
+-                        <div class="text-xs" style="color: var(--modal-text-secondary);">Goal (3h)</div>
+-                    </div>
+-                </div>
+-            </div>
+-            <div class="rounded-lg p-4 mt-4" style="background-color: var(--modal-card-bg); text-align: center;">
+-                <div class="text-sm" style="color: var(--modal-text-secondary);">SLA Compliance</div>
+-                <div class="flex justify-center mt-2">
+-                    <div class="text-center mx-2">
+-                        <div class="text-lg font-bold text-cyan-300" id="drill-sla-baseline">0%</div>
+-                        <div class="text-xs" style="color: var(--modal-text-secondary);">95.5% Base (4h)</div>
+-                    </div>
+-                    <div class="text-center mx-2">
+-                        <div class="text-lg font-bold text-cyan-300" id="drill-sla-goal">0%</div>
+-                        <div class="text-xs" style="color: var(--modal-text-secondary);">Goal (3h)</div>
+-                    </div>
+-                </div>
+-            </div>
+ 
