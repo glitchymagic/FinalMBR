@@ -1,0 +1,34 @@
+--- templates/dashboard.html.old
++++ templates/dashboard.html
+@@ -5419,10 +5419,10 @@
+     populateTeamDrillDown(teamData);
+     
+     try {
+-    } catch (error) {
+-        console.error("Error fetching team drill-down data:", error);
+-        const modalLoading = document.getElementById("modal-loading");
+-        if (modalLoading) {
++    } 
++} catch (error) {
++    console.error("Error fetching team drill-down data:", error);
++    const modalLoading = document.getElementById("modal-loading");
++    if (modalLoading) {
+             modalLoading.innerHTML = `
+                 <div class="text-center py-12">
+                     <div class="text-red-400 text-xl mb-4">⚠️</div>
+@@ -1102,17 +1102,9 @@
+             <div class="text-2xl font-bold mb-2" style="color: var(--modal-text-primary);">SLA Compliance</div>
+             <div class="text-sm mb-4" style="color: var(--modal-text-secondary);">Performance against service level agreements</div>
+             <div class="grid grid-cols-2 gap-4 text-center">
+-                <div class="rounded-lg p-4" style="background-color: var(--modal-card-bg);">
+-                    <div class="text-lg font-bold text-cyan-300" id="drill-sla-baseline">0%</div>
+-                    <div class="text-xs" style="color: var(--modal-text-secondary);">95.5% Base (4h)</div>
+-                </div>
+                 <div class="rounded-lg p-4" style="background-color: var(--modal-card-bg);">
+                     <div class="text-lg font-bold text-cyan-300" id="drill-sla-goal">0%</div>
+                     <div class="text-xs" style="color: var(--modal-text-secondary);">Goal (3h)</div>
+                 </div>
+             </div>
+-            <div class="rounded-lg p-4 mt-4" style="background-color: var(--modal-card-bg); text-align: center;">
+-                <div class="text-sm" style="color: var(--modal-text-secondary);">SLA Compliance</div>
+ 

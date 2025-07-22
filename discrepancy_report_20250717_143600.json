@@ -1,0 +1,222 @@
+{
+  "summary": {
+    "total_checks": 29,
+    "consistent": 14,
+    "discrepancies": 15,
+    "accuracy_rate": 48.275862068965516,
+    "timestamp": "2025-07-17T14:36:00.421678"
+  },
+  "discrepancies": [
+    {
+      "test_name": "SLA Breach Count",
+      "expected": 349,
+      "actual": 0,
+      "difference": 349,
+      "details": "SLA breach counts don't match between overview and SLA API",
+      "timestamp": "2025-07-17T14:35:59.159252"
+    },
+    {
+      "test_name": "Technician Count",
+      "expected": 79,
+      "actual": 74,
+      "difference": 5,
+      "details": "Technician counts don't match between overview and technicians API",
+      "timestamp": "2025-07-17T14:35:59.389399"
+    },
+    {
+      "test_name": "Team Drill-down (DGTC)",
+      "expected": 1134,
+      "actual": 0,
+      "difference": 1134,
+      "details": "Team performance and drill-down incident counts don't match",
+      "timestamp": "2025-07-17T14:35:59.836652"
+    },
+    {
+      "test_name": "Team Drill-down (Homeoffice)",
+      "expected": 1031,
+      "actual": 0,
+      "difference": 1031,
+      "details": "Team performance and drill-down incident counts don't match",
+      "timestamp": "2025-07-17T14:35:59.861291"
+    },
+    {
+      "test_name": "Team Drill-down (Sunnyvale)",
+      "expected": 976,
+      "actual": 0,
+      "difference": 976,
+      "details": "Team performance and drill-down incident counts don't match",
+      "timestamp": "2025-07-17T14:35:59.883638"
+    },
+    {
+      "test_name": "MTTR Drill-down (2025-02)",
+      "expected": 2.6,
+      "actual": 0,
+      "difference": 2.6,
+      "details": "MTTR values don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.013873"
+    },
+    {
+      "test_name": "FCR Drill-down (2025-02)",
+      "expected": 99.5,
+      "actual": 100.0,
+      "difference": 0.5,
+      "details": "FCR values don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.073378"
+    },
+    {
+      "test_name": "Incident Drill-down (2025-02)",
+      "expected": 2172,
+      "actual": 2093,
+      "difference": 79,
+      "details": "Incident counts don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.090622"
+    },
+    {
+      "test_name": "MTTR Drill-down (2025-03)",
+      "expected": 6.7,
+      "actual": 0,
+      "difference": 6.7,
+      "details": "MTTR values don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.122018"
+    },
+    {
+      "test_name": "FCR Drill-down (2025-03)",
+      "expected": 99.5,
+      "actual": 99.3,
+      "difference": 0.20000000000000284,
+      "details": "FCR values don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.177203"
+    },
+    {
+      "test_name": "Incident Drill-down (2025-03)",
+      "expected": 1960,
+      "actual": 1883,
+      "difference": 77,
+      "details": "Incident counts don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.193507"
+    },
+    {
+      "test_name": "MTTR Drill-down (2025-04)",
+      "expected": 2.8,
+      "actual": 0,
+      "difference": 2.8,
+      "details": "MTTR values don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.224443"
+    },
+    {
+      "test_name": "FCR Drill-down (2025-04)",
+      "expected": 99.6,
+      "actual": 100.0,
+      "difference": 0.4000000000000057,
+      "details": "FCR values don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.284061"
+    },
+    {
+      "test_name": "Incident Drill-down (2025-04)",
+      "expected": 2279,
+      "actual": 2176,
+      "difference": 103,
+      "details": "Incident counts don't match between overview and drill-down",
+      "timestamp": "2025-07-17T14:36:00.301027"
+    },
+    {
+      "test_name": "Region Totals",
+      "expected": 9613,
+      "actual": 9629,
+      "difference": 16,
+      "details": "Sum of region incidents doesn't match overview total",
+      "timestamp": "2025-07-17T14:36:00.330228"
+    }
+  ],
+  "consistent_checks": [
+    {
+      "test_name": "Location Count",
+      "value": 23,
+      "details": "Matches overview (23)",
+      "timestamp": "2025-07-17T14:35:59.394665"
+    },
+    {
+      "test_name": "Filter Consistency (region=IDC)",
+      "value": 2649,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.443718"
+    },
+    {
+      "test_name": "Filter Consistency (region=Puerto Rico)",
+      "value": 864,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.469765"
+    },
+    {
+      "test_name": "Filter Consistency (region=Central Region)",
+      "value": 3366,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.518159"
+    },
+    {
+      "test_name": "Filter Consistency (location=Aviation)",
+      "value": 1,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.537786"
+    },
+    {
+      "test_name": "Filter Consistency (location=Bellevue)",
+      "value": 143,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.557986"
+    },
+    {
+      "test_name": "Filter Consistency (location=Charlotte)",
+      "value": 32,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.579959"
+    },
+    {
+      "test_name": "Filter Consistency (quarter=Q1)",
+      "value": 6411,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.645230"
+    },
+    {
+      "test_name": "Filter Consistency (month=2025-02)",
+      "value": 2172,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.718571"
+    },
+    {
+      "test_name": "Filter Consistency (month=2025-03)",
+      "value": 1960,
+      "details": "Overview and team performance match",
+      "timestamp": "2025-07-17T14:35:59.762567"
+    },
+    {
+      "test_name": "SLA Breach Severity Totals",
+      "value": 349,
+      "details": "Matches overview total (349)",
+      "timestamp": "2025-07-17T14:35:59.980952"
+    },
+    {
+      "test_name": "FCR Rate Range",
+      "value": 99.6,
+      "details": "Within valid range (0-100%)",
+      "timestamp": "2025-07-17T14:36:00.373786"
+    },
+    {
+      "test_name": "MTTR Value",
+      "value": 3.9,
+      "details": "Non-negative value",
+      "timestamp": "2025-07-17T14:36:00.373927"
+    },
+    {
+      "test_name": "SLA Compliance Range",
+      "value": 100.0,
+      "details": "Within valid range (0-100%)",
+      "timestamp": "2025-07-17T14:36:00.373981"
+    }
+  ],
+  "categories": {
+    "Count Mismatches": 2,
+    "Drill-down Discrepancies": 12,
+    "Other Issues": 1
+  }
+}

@@ -1,0 +1,13 @@
+{"west_coast_technicians": {
+"Sunnyvale": 
+[{"incidents":61,"name":"Rebecca Xu","percentage":"37.7"},{"incidents":52,"name":"Michelo Joseph","percentage":"32.1"},{"incidents":41,"name":"Alan Tam","percentage":"25.3"},{"incidents":5,"name":"Jonathan Juarez Villegas","percentage":"3.1"},{"incidents":3,"name":"Nitin Garimella","percentage":"1.9"}]
+,
+"San Bruno": 
+[{"incidents":39,"name":"John Lovejoy","percentage":"38.2"},{"incidents":24,"name":"Lou Stern","percentage":"23.5"},{"incidents":19,"name":"Rodney Holgado","percentage":"18.6"},{"incidents":18,"name":"Jim Cetin","percentage":"17.6"},{"incidents":1,"name":"Nicole Fu","percentage":"1.0"},{"incidents":1,"name":"Theresa Marie Redwood","percentage":"1.0"}]
+,
+"Los Angeles": 
+[{"incidents":50,"name":"Carlos Mancia","percentage":"100.0"}]
+,
+"Seattle": 
+[{"incidents":33,"name":"Han-Earl Ryu","percentage":"100.0"}]
+}}

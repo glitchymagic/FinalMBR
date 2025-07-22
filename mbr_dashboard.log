@@ -1,0 +1,58 @@
+⚠️  Data quality: Original 'Resolve time' differs from calculated by avg 15146.1 minutes
+Data loaded successfully: 10342 incidents
+Date range: 2025-02-01 02:18:45 to 2025-06-30 23:55:46
+Resolved incidents: 10331/10342
+Valid resolution times: 10335/10342
+Weekday incidents: 10023, Weekend incidents: 319 (excluded from MTTR)
+SLA compliance (native): 10342/10342 = 100.0%
+SLA compliance (MTTR-based): 9975/10342 = 96.5%
+SLA goal compliance (192-min goal): 9884/10342 = 95.6%
+SLA breaches (240-min promise): 356/10342 = 3.4%
+Teams: 28 unique assignment groups
+MTTR Analysis:
+  Average MTTR (business hours): 3.1 hours
+  Average MTTR (total elapsed): 4.1 hours
+  Weekend time excluded: 1.1 hours
+✅ All assignment groups successfully mapped to regions
+Region mapping loaded: 28/28 assignment groups mapped
+Region distribution:
+  Central Region: 4120 incidents (39.8%)
+  IDC: 2771 incidents (26.8%)
+  West Region: 1606 incidents (15.5%)
+  East Region: 1412 incidents (13.7%)
+  Puerto Rico: 433 incidents (4.2%)
+Consultation region distribution:
+  Central Region: 12296 consultations (42.7%)
+  West Region: 7032 consultations (24.4%)
+  IDC: 5586 consultations (19.4%)
+  East Region: 3423 consultations (11.9%)
+  Puerto Rico: 466 consultations (1.6%)
+Consultation data loaded: 28803 consultations
+Date range: 2025-02-02 18:59:00 to 2025-05-06 10:26:00
+Completion rate: 28785/28803 = 99.9%
+Locations: 23 unique locations
+Technicians: 79 unique technicians
+🚀 Starting MBR Dashboard on port 3000...
+🌐 Open your browser to: http://127.0.0.1:3000
+   Press Ctrl+C to stop the server
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://10.4.19.163:3000
+Press CTRL+C to quit
+127.0.0.1 - - [11/Jul/2025 14:44:51] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:07] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:13] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:49] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/regions HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/locations HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /favicon.ico HTTP/1.1" 204 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/ai_insights?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/kb_trending?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/overview?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/sla_breach?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/trends?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/team_performance?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
+127.0.0.1 - - [11/Jul/2025 14:47:50] "GET /api/team_performance?quarter=all&month=all&location=all&region=East%20Region&assignment_group=all HTTP/1.1" 200 -
