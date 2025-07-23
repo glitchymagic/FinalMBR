@@ -1,0 +1,13 @@
+{"west_coast_summary": {
+"Sunnyvale": 
+{"avg_mttr_hours":0.4,"avg_mttr_minutes":23.0,"resolved_incidents":145,"total_incidents":145}
+,
+"San Bruno": 
+{"avg_mttr_hours":0.4,"avg_mttr_minutes":22.0,"resolved_incidents":88,"total_incidents":88}
+,
+"Los Angeles": 
+{"avg_mttr_hours":0.1,"avg_mttr_minutes":7.0,"resolved_incidents":50,"total_incidents":50}
+,
+"Seattle": 
+{"avg_mttr_hours":0.2,"avg_mttr_minutes":15.0,"resolved_incidents":30,"total_incidents":30}
+}}

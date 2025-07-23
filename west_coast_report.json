@@ -1,0 +1,9 @@
+{"west_coast_team_performance": [
+{"avg_resolution_time":0.4,"critical_breach_rate":0.6,"critical_breaches":1,"fcr_rate":99.4,"incidents":162,"sla_breach_rate":1.9,"sla_breaches":3,"sla_compliance_mttr":98.2,"sla_goal_compliance":98.2,"team":"Sunnyvale"}
+,
+{"avg_resolution_time":0.3,"critical_breach_rate":1.0,"critical_breaches":1,"fcr_rate":100.0,"incidents":102,"sla_breach_rate":1.0,"sla_breaches":1,"sla_compliance_mttr":99.0,"sla_goal_compliance":99.0,"team":"San Bruno"}
+,
+{"avg_resolution_time":0.1,"critical_breach_rate":0.0,"critical_breaches":0,"fcr_rate":100.0,"incidents":50,"sla_breach_rate":0.0,"sla_breaches":0,"sla_compliance_mttr":100.0,"sla_goal_compliance":100.0,"team":"Los Angeles"}
+,
+{"avg_resolution_time":0.3,"critical_breach_rate":0.0,"critical_breaches":0,"fcr_rate":100.0,"incidents":33,"sla_breach_rate":0.0,"sla_breaches":0,"sla_compliance_mttr":100.0,"sla_goal_compliance":100.0,"team":"Seattle"}
+]}

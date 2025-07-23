@@ -1,0 +1,382 @@
+{
+  "summary": {
+    "total_tests": 53,
+    "passed": 45,
+    "failed": 8,
+    "success_rate": 84.90566037735849,
+    "timestamp": "2025-07-17T14:00:52.289862"
+  },
+  "detailed_results": [
+    {
+      "test_name": "Basic Endpoint: /api/regions",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.295680",
+      "details": "Returned object items",
+      "response_data": null
+    },
+    {
+      "test_name": "Basic Endpoint: /api/locations",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.301519",
+      "details": "Returned object items",
+      "response_data": null
+    },
+    {
+      "test_name": "Basic Endpoint: /api/assignment_groups",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.317189",
+      "details": "Returned object items",
+      "response_data": null
+    },
+    {
+      "test_name": "Basic Endpoint: /api/overview",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.344267",
+      "details": "Returned object items",
+      "response_data": null
+    },
+    {
+      "test_name": "Basic Endpoint: /api/trends",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.378665",
+      "details": "Returned object items",
+      "response_data": null
+    },
+    {
+      "test_name": "Basic Endpoint: /api/team_performance",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.439198",
+      "details": "Returned 24 items",
+      "response_data": null
+    },
+    {
+      "test_name": "Basic Endpoint: /api/sla_breach",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.464868",
+      "details": "Returned object items",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter quarter=Q1 (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.493567",
+      "details": "Total incidents: 6411",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter quarter=Q1 (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.518988",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter quarter=Q2 (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.531922",
+      "details": "Total incidents: 3202",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter quarter=Q2 (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.551110",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter month=January (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.572826",
+      "details": "Total incidents: 9613",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter month=January (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.602685",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter month=February (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.623464",
+      "details": "Total incidents: 9613",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter month=February (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.653070",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter month=March (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.674666",
+      "details": "Total incidents: 9613",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter month=March (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.704985",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter region=IDC (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.717264",
+      "details": "Total incidents: 2649",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter region=IDC (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.736489",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter region=Puerto Rico (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.743916",
+      "details": "Total incidents: 864",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter region=Puerto Rico (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.759614",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter location=Aviation (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.766519",
+      "details": "Total incidents: 1",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter location=Aviation (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.773977",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter location=Bellevue (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.781219",
+      "details": "Total incidents: 143",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter location=Bellevue (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.793142",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter location=Charlotte (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.800081",
+      "details": "Total incidents: 32",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter location=Charlotte (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.809600",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter assignment_group=AEDT - Enterprise Tech Spot - DGTC (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.818618",
+      "details": "Total incidents: 1134",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter assignment_group=AEDT - Enterprise Tech Spot - DGTC (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.833715",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter assignment_group=AEDT - Enterprise Tech Spot - Homeoffice (overview)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.842214",
+      "details": "Total incidents: 1031",
+      "response_data": null
+    },
+    {
+      "test_name": "Filter assignment_group=AEDT - Enterprise Tech Spot - Homeoffice (trends)",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.858590",
+      "details": "Trend data points: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Combined Filter: region=IDC, quarter=Q1",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.875147",
+      "details": "Total incidents: 1805",
+      "response_data": null
+    },
+    {
+      "test_name": "Combined Filter: location=Aviation, month=March",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.881219",
+      "details": "Total incidents: 1",
+      "response_data": null
+    },
+    {
+      "test_name": "Combined Filter: region=IDC, location=Aviation",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:51.887481",
+      "details": "Total incidents: 1",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/team_drill_down",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:51.904167",
+      "details": "HTTP 404: {\"error\":\"Team \\\"Central Tech Spot\\\" not found\"}\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/incident_details",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:51.906489",
+      "details": "HTTP 404: {\"error\":\"Incident not found\"}\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/sla_breach_incidents",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:51.924562",
+      "details": "HTTP 400: {\"error\":\"Invalid severity level: high. Valid options: minor, moderate, critical\"}\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/mttr_drilldown",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:51.980502",
+      "details": "HTTP 500: <!doctype html>\n<html lang=en>\n<title>500 Internal Server Error</title>\n<h1>Internal Server Error</h1>\n<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/incident_drilldown",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:51.990008",
+      "details": "HTTP 500: <!doctype html>\n<html lang=en>\n<title>500 Internal Server Error</title>\n<h1>Internal Server Error</h1>\n<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/application_drilldown",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:51.991393",
+      "details": "HTTP 400: {\"error\":\"Month and application_type parameters required\"}\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Drill-down: /api/fcr_drilldown",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:52.000488",
+      "details": "HTTP 500: <!doctype html>\n<html lang=en>\n<title>500 Internal Server Error</title>\n<h1>Internal Server Error</h1>\n<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>\n",
+      "response_data": null
+    },
+    {
+      "test_name": "Data Consistency - Incident Totals",
+      "status": "FAIL",
+      "timestamp": "2025-07-17T14:00:52.054488",
+      "details": "Mismatch - Overview: 9613, Trends: 0",
+      "response_data": null
+    },
+    {
+      "test_name": "Edge Case: /api/overview with {'region': 'NonExistentRegion'}",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.061066",
+      "details": "Handled gracefully",
+      "response_data": null
+    },
+    {
+      "test_name": "Edge Case: /api/trends with {'month': 'InvalidMonth'}",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.091105",
+      "details": "Handled gracefully",
+      "response_data": null
+    },
+    {
+      "test_name": "Edge Case: /api/team_drill_down with {'team': 'NonExistentTeam'}",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.108594",
+      "details": "Handled gracefully",
+      "response_data": null
+    },
+    {
+      "test_name": "Edge Case: /api/incident_details with {'incident_number': 'INVALID123'}",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.111235",
+      "details": "Handled gracefully",
+      "response_data": null
+    },
+    {
+      "test_name": "Edge Case: /api/mttr_drilldown with {'month': ''}",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.112725",
+      "details": "Handled gracefully",
+      "response_data": null
+    },
+    {
+      "test_name": "Performance: /api/overview",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.132124",
+      "details": "Response time: 0.02s",
+      "response_data": null
+    },
+    {
+      "test_name": "Performance: /api/trends",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.165453",
+      "details": "Response time: 0.03s",
+      "response_data": null
+    },
+    {
+      "test_name": "Performance: /api/team_performance",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.207626",
+      "details": "Response time: 0.04s",
+      "response_data": null
+    },
+    {
+      "test_name": "Performance: /api/sla_breach",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.232958",
+      "details": "Response time: 0.03s",
+      "response_data": null
+    },
+    {
+      "test_name": "AI Insights",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.259524",
+      "details": "Generated 7 insights",
+      "response_data": null
+    },
+    {
+      "test_name": "KB Trending",
+      "status": "PASS",
+      "timestamp": "2025-07-17T14:00:52.289407",
+      "details": "Returned valid KB data",
+      "response_data": null
+    }
+  ]
+}
