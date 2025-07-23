@@ -841,8 +841,6 @@
                             <div class="flex items-center mb-3">
                                 <span class="text-2xl font-bold text-white animated-number" id="incident-total">...</span>
                                 <span class="text-xs text-gray-400 ml-2">total</span>
-                                <span class="text-lg font-medium text-white ml-3 animated-number" id="incident-delta">...</span>
-                                <span class="text-xs text-gray-400 ml-1">Δ change</span>
                             </div>
                             <div style="height: 250px;">
                                 <canvas id="incidentChart"></canvas>
@@ -948,10 +946,10 @@
                                         <div class="text-orange-300">Moderate</div>
                                         <div class="text-gray-300">3-4hrs over</div>
                                     </div>
-                                    <div class="metric-card bg-gray-500 rounded p-2" style="animation-delay: 0.4s;">
-                                        <div class="text-lg font-bold text-white animated-number" id="flagged-teams">...</div>
-                                        <div class="text-gray-200">Teams</div>
-                                        <div class="text-gray-300">Flagged</div>
+                                    <div class="metric-card bg-gray-500 rounded p-2 cursor-pointer hover:bg-gray-400 transition-colors transform hover:scale-105 active:scale-95" style="animation-delay: 0.4s;" onclick="showSlaBreachIncidents('low')" title="Click to view incidents that meet SLA requirements">
+                                        <div class="text-lg font-bold text-white animated-number" id="low-total">...</div>
+                                        <div class="text-green-300">Low</div>
+                                        <div class="text-gray-300">Meets SLA</div>
                                     </div>
                                 </div>
                             </div>
@@ -1014,6 +1012,61 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Debug Panel -->
+        <div id="debug-panel" class="fixed bottom-4 right-4 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 max-w-md" style="display: none;">
+            <div class="p-3 border-b border-gray-600 flex items-center justify-between">
+                <h4 class="text-sm font-medium text-green-400">🔧 SLA Debug Panel</h4>
+                <div class="flex space-x-2">
+                    <button onclick="clearDebugLog()" class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300">Clear</button>
+                    <button onclick="toggleDebugPanel()" class="text-gray-400 hover:text-white">✕</button>
+                </div>
+            </div>
+            <div class="p-3 max-h-96 overflow-y-auto">
+                <!-- API Status -->
+                <div class="mb-3">
+                    <div class="text-xs font-medium text-blue-400 mb-1">API Status</div>
+                    <div id="debug-api-status" class="text-xs text-gray-300 bg-gray-900 p-2 rounded font-mono">
+                        Waiting for data...
+                    </div>
+                </div>
+                
+                <!-- SLA Breakdown Data -->
+                <div class="mb-3">
+                    <div class="text-xs font-medium text-yellow-400 mb-1">SLA Breakdown Values</div>
+                    <div id="debug-sla-breakdown" class="text-xs text-gray-300 bg-gray-900 p-2 rounded font-mono">
+                        Critical: -<br>
+                        Moderate: -<br>
+                        Low: -
+                    </div>
+                </div>
+                
+                <!-- Raw API Response -->
+                <div class="mb-3">
+                    <div class="text-xs font-medium text-purple-400 mb-1">Last API Response</div>
+                    <div id="debug-api-response" class="text-xs text-gray-300 bg-gray-900 p-2 rounded font-mono max-h-32 overflow-y-auto">
+                        No data received yet
+                    </div>
+                </div>
+                
+                <!-- Real-time Log -->
+                <div>
+                    <div class="text-xs font-medium text-red-400 mb-1">Activity Log</div>
+                    <div id="debug-activity-log" class="text-xs text-gray-300 bg-gray-900 p-2 rounded font-mono max-h-32 overflow-y-auto">
+                        Debug panel initialized
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Debug Toggle Button -->
+        <div class="fixed bottom-4 right-4 z-40">
+            <button onclick="toggleDebugPanel()" 
+                    class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-colors"
+                    title="Toggle Debug Panel">
+                🔧
+            </button>
         </div>
 
         <!-- Footer -->
@@ -1912,6 +1965,33 @@
         window.chartGridColor = 'rgba(255, 255, 255, 0.1)';
         window.chartTickColor = '#9ca3af';
 
+        // Smart MTTR formatting function - shows minutes for short times, hours for longer times
+        function formatMTTR(hours, minutes = null) {
+            // If minutes are provided directly, use them
+            if (minutes !== null) {
+                if (minutes < 60) {
+                    return `${Math.round(minutes)}m`;
+                } else {
+                    const h = minutes / 60;
+                    return h < 1 ? `${Math.round(minutes)}m` : `${h.toFixed(1)}h`;
+                }
+            }
+            
+            // If only hours provided, convert and format appropriately
+            if (hours === 0 || hours === null || hours === undefined) {
+                return '0m';
+            }
+            
+            if (hours < 1) {
+                // Less than 1 hour - show in minutes
+                const mins = Math.round(hours * 60);
+                return mins === 0 ? '0m' : `${mins}m`;
+            } else {
+                // 1 hour or more - show in hours with 1 decimal
+                return `${hours.toFixed(1)}h`;
+            }
+        }
+        
         // Helper function to parse time period into quarter and month
         function parseTimePeriod(timePeriod) {
             if (timePeriod === 'all') {
@@ -2145,45 +2225,54 @@
             const selectedRegion = document.getElementById('region-filter').value;
             currentRegion = selectedRegion;
             
-            // Smart filtering: If region is selected, update location filter to show only locations in that region
-            if (selectedRegion !== 'all') {
-                fetch(`/api/locations?region=${selectedRegion}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const locationFilter = document.getElementById('location-filter');
-                        // Store current location selection
-                        const currentLocationValue = locationFilter.value;
-                        
-                        // Clear existing options except "All Locations"
-                        locationFilter.innerHTML = '<option value="all">All Locations</option>';
-                        
-                        // Add location options for this region
+            // Always fetch and display individual locations, regardless of region selection
+            fetch(`/api/locations?region=${selectedRegion}`)
+                .then(response => response.json())
+                .then(data => {
+                    const locationFilter = document.getElementById('location-filter');
+                    // Store current location selection
+                    const currentLocationValue = locationFilter.value;
+                    
+                    // Clear existing options and add "All Locations" option
+                    locationFilter.innerHTML = '<option value="all">All Locations</option>';
+                    
+                    // Add individual location options (with incident counts if available)
+                    if (data.locations && data.locations.length > 0) {
                         data.locations.forEach(location => {
                             const option = document.createElement('option');
                             option.value = location.value;
-                            option.textContent = location.display_name;
+                            option.textContent = location.display_name; // Already includes incident count from backend
                             locationFilter.appendChild(option);
                             
                             // Update location to region mapping
-                            locationToRegionMapping[location.value] = selectedRegion;
+                            locationToRegionMapping[location.value] = location.region || selectedRegion;
                         });
                         
-                        // If previous location is still in the list, keep it selected
-                        if ([...locationFilter.options].some(opt => opt.value === currentLocationValue)) {
-                            locationFilter.value = currentLocationValue;
-                        } else {
-                            // Otherwise reset to "all"
-                            locationFilter.value = 'all';
-                            
-                            // Show notification about filtered locations
+                        // Show notification about available locations
+                        if (selectedRegion !== 'all') {
                             showSmartFilterNotification(`📍 Showing ${data.locations.length} locations in ${selectedRegion}`);
+                        } else {
+                            showSmartFilterNotification(`📍 Showing all ${data.locations.length} locations across all regions`);
                         }
-                    })
-                    .catch(error => console.error('Error fetching filtered locations:', error));
-            } else {
-                // Reset to all locations
-                fetchLocations();
-            }
+                    } else {
+                        // Fallback if no locations data
+                        console.warn('No locations data received from API');
+                    }
+                    
+                    // If previous location is still in the list, keep it selected
+                    if ([...locationFilter.options].some(opt => opt.value === currentLocationValue)) {
+                        locationFilter.value = currentLocationValue;
+                    } else {
+                        // Otherwise reset to "all"
+                        locationFilter.value = 'all';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching locations:', error);
+                    // Fallback: at least show "All Locations" option
+                    const locationFilter = document.getElementById('location-filter');
+                    locationFilter.innerHTML = '<option value="all">All Locations</option>';
+                });
             
             // Show notification about filtered locations  
             if (selectedRegion !== 'all') {
@@ -2904,6 +2993,12 @@
         }
 
         function updateOverviewMetrics(data) {
+            // Debug: Log API response and update debug panel
+            updateDebugApiStatus('✅ Overview data received', '/api/overview');
+            updateDebugApiResponse(data);
+            updateDebugSLABreakdown(data);
+            logDebugActivity('📥 updateOverviewMetrics called');
+            
             // Animate header stats with staggered timing
             animateNumberChange('technicians', data.technicians);
             setTimeout(() => animateNumberChange('customers', data.customers, '+'), 100);
@@ -2916,11 +3011,37 @@
                 // Add incident delta percentage with proper animation
                 animateNumberChange('incident-delta', data.incident_change, '%');
                 animateNumberChange('fcr-total', data.fcr_rate, '%');
-                animateNumberChange('mttr-total', data.avg_resolution_time, 'h');
+                // Use smart MTTR formatting for better granularity
+                const mttrElement = document.getElementById('mttr-total');
+                if (mttrElement) {
+                    mttrElement.textContent = formatMTTR(data.avg_resolution_time);
+                }
                 animateNumberChange('sla-goal', data.sla_goal_compliance, '%');
-            animateNumberChange('sla-baseline', data.sla_compliance_mttr, '%');
+                animateNumberChange('sla-baseline', data.sla_compliance_mttr, '%');
                 animateNumberChange('breach-total', (data.sla_breaches || 0).toLocaleString());
                 animateNumberChange('breach-rate', data.sla_breach_rate, '%');
+                
+                // Update SLA Breakdown (Critical/Moderate/Low) with staggered timing
+                if (data.critical_total !== undefined) {
+                    setTimeout(() => {
+                        animateNumberChange('critical-total', (data.critical_total || 0).toLocaleString());
+                        logDebugActivity(`🔴 Critical updated: ${data.critical_total}`);
+                    }, 400);
+                }
+                if (data.moderate_total !== undefined) {
+                    setTimeout(() => {
+                        animateNumberChange('moderate-total', (data.moderate_total || 0).toLocaleString());
+                        logDebugActivity(`🟠 Moderate updated: ${data.moderate_total}`);
+                    }, 500);
+                }
+                if (data.low_total !== undefined) {
+                    setTimeout(() => {
+                        animateNumberChange('low-total', (data.low_total || 0).toLocaleString());
+                        logDebugActivity(`🟢 Low updated: ${data.low_total}`);
+                    }, 600);
+                } else {
+                    logDebugActivity('⚠️ low_total not found in API response');
+                }
             }, 300);
         }
 
@@ -4608,7 +4729,7 @@
                         <div class="text-xs" style="color: var(--modal-text-secondary);">Total Incidents</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-amber-400">${data.summary.avg_mttr_hours}h</div>
+                        <div class="text-2xl font-bold text-amber-400">${formatMTTR(data.summary.avg_mttr_hours)}</div>
                         <div class="text-xs" style="color: var(--modal-text-secondary);">Average MTTR</div>
                     </div>
                 </div>
@@ -6460,8 +6581,10 @@ async function fetchTeamDrillDownData(teamName, timePeriod = null) {
         // Application drill-down function
         async function showApplicationDrillDown(applicationName, monthDate) {
             console.log(`🔍 showApplicationDrillDown called with: applicationName="${applicationName}", monthDate="${monthDate}"`);
+            console.log(`🔍 DEBUGGING: currentTimePeriod = "${currentTimePeriod}"`);
+            console.log(`🔍 DEBUGGING: Dashboard title = "${document.querySelector('h1')?.textContent || 'NOT FOUND'}"`);
             
-            // If no specific month provided, use current dashboard time period
+            // If no specific month provided, determine what month the main dashboard is currently showing
             if (!monthDate) {
                 const { quarter, month } = parseTimePeriod(currentTimePeriod);
                 console.log(`📅 Parsed currentTimePeriod "${currentTimePeriod}" to: quarter="${quarter}", month="${month}"`);
@@ -6470,8 +6593,9 @@ async function fetchTeamDrillDownData(teamName, timePeriod = null) {
                 if (month && month !== 'all') {
                     monthDate = month;
                 } else {
-                    // For quarters or "all", use most recent month (June 2025)
-                    monthDate = '2025-06';
+                    // For quarters or "all", use May 2025 to match current dashboard display
+                    monthDate = '2025-05';
+                    console.log(`📅 Using May 2025 for application drill-down`);
                 }
                 
                 console.log(`✅ Using ${monthDate} for application drill-down (from currentTimePeriod: ${currentTimePeriod})`);
@@ -6553,7 +6677,7 @@ async function fetchTeamDrillDownData(teamName, timePeriod = null) {
                         </div>
                         <div class="bg-gray-700 rounded-lg p-4">
                             <div class="text-gray-400 text-xs">Avg MTTR</div>
-                            <div class="text-2xl font-bold text-orange-400">${summary.avg_mttr_hours}h</div>
+                            <div class="text-2xl font-bold text-orange-400">${formatMTTR(summary.avg_mttr_hours)}</div>
                         </div>
                         <div class="bg-gray-700 rounded-lg p-4">
                             <div class="text-gray-400 text-xs">SLA Compliance</div>
@@ -6593,7 +6717,7 @@ async function fetchTeamDrillDownData(teamName, timePeriod = null) {
                                             <span class="px-2 py-1 rounded text-xs ${incident.sla_met ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}">
                                                 ${incident.sla_met ? 'SLA Met' : 'SLA Missed'}
                                             </span>
-                                            ${incident.mttr_minutes ? `<span class="px-2 py-1 bg-orange-900 text-orange-300 rounded text-xs">${Math.round(incident.mttr_minutes / 60)}h MTTR</span>` : ''}
+                                            ${incident.mttr_minutes ? `<span class="px-2 py-1 bg-orange-900 text-orange-300 rounded text-xs">${formatMTTR(null, incident.mttr_minutes)} MTTR</span>` : ''}
                                         </div>
                                     </div>
                                     <div class="text-sm text-gray-300 mb-2">${incident.description}</div>
@@ -6815,7 +6939,91 @@ async function fetchTeamDrillDownData(teamName, timePeriod = null) {
                 
 
             });
+            
+            // Initialize debug panel on page load
+            initializeDebugPanel();
         });
+        
+        // Debug Panel Functions
+        let debugPanelVisible = false;
+        
+        function toggleDebugPanel() {
+            const panel = document.getElementById('debug-panel');
+            const button = document.querySelector('.fixed.bottom-4.right-4.z-40 button');
+            
+            debugPanelVisible = !debugPanelVisible;
+            
+            if (debugPanelVisible) {
+                panel.style.display = 'block';
+                button.style.display = 'none';
+                logDebugActivity('🟢 Debug panel opened');
+            } else {
+                panel.style.display = 'none';
+                button.style.display = 'block';
+                logDebugActivity('🔴 Debug panel closed');
+            }
+        }
+        
+        function clearDebugLog() {
+            document.getElementById('debug-activity-log').innerHTML = 'Debug log cleared';
+            logDebugActivity('🧹 Debug log cleared');
+        }
+        
+        function logDebugActivity(message) {
+            const log = document.getElementById('debug-activity-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = `[${timestamp}] ${message}`;
+            
+            if (log.innerHTML === 'Debug panel initialized' || log.innerHTML === 'Debug log cleared') {
+                log.innerHTML = entry;
+            } else {
+                log.innerHTML += '<br>' + entry;
+            }
+            
+            // Auto-scroll to bottom
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        function updateDebugSLABreakdown(data) {
+            const breakdown = document.getElementById('debug-sla-breakdown');
+            const critical = data.critical_total !== undefined ? data.critical_total : 'undefined';
+            const moderate = data.moderate_total !== undefined ? data.moderate_total : 'undefined';
+            const low = data.low_total !== undefined ? data.low_total : 'undefined';
+            
+            breakdown.innerHTML = `
+                Critical: ${critical}<br>
+                Moderate: ${moderate}<br>
+                Low: ${low}
+            `;
+            
+            logDebugActivity(`📊 SLA breakdown updated: C:${critical} M:${moderate} L:${low}`);
+        }
+        
+        function updateDebugApiStatus(status, endpoint = '') {
+            const statusDiv = document.getElementById('debug-api-status');
+            const timestamp = new Date().toLocaleTimeString();
+            statusDiv.innerHTML = `[${timestamp}] ${status} ${endpoint}`;
+        }
+        
+        function updateDebugApiResponse(data) {
+            const responseDiv = document.getElementById('debug-api-response');
+            const filteredData = {
+                total_incidents: data.total_incidents,
+                critical_total: data.critical_total,
+                moderate_total: data.moderate_total,
+                low_total: data.low_total,
+                sla_breaches: data.sla_breaches,
+                sla_compliance_mttr: data.sla_compliance_mttr
+            };
+            
+            responseDiv.innerHTML = JSON.stringify(filteredData, null, 2);
+            responseDiv.scrollTop = responseDiv.scrollHeight;
+        }
+        
+        function initializeDebugPanel() {
+            logDebugActivity('🚀 Debug panel initialized');
+            updateDebugApiStatus('⏳ Waiting for first API call');
+        }
     </script>
 </body>
 </html> 
