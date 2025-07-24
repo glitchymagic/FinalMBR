@@ -11,6 +11,10 @@ from MTTR import calculate_business_minutes  # Import business hours calculation
 app = Flask(__name__)
 CORS(app)
 
+# Force template reloading for development
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
+
 # Add comprehensive cache-busting headers to force browser refresh
 @app.after_request
 def add_cache_control_headers(response):
@@ -528,12 +532,12 @@ def apply_filters(df, quarter=None, month=None, location=None, region=None, assi
     
     return filtered_df
 
-def apply_consultation_filters(df, quarter=None, month=None, location=None, region=None):
-    """Apply quarter, month, location, and region filters to consultation dataframe"""
+def apply_consultation_filters(df, quarter=None, month=None, location=None, region=None, technician=None):
+    """Apply quarter, month, location, region, and technician filters to consultation dataframe"""
     initial_count = len(df)
     filtered_df = df.copy()
     print(f"🔧 CONSULTATION_FILTERS: Starting with {initial_count} consultations")
-    print(f"🔧 CONSULTATION_FILTERS: Parameters - quarter={quarter}, month={month}, location={location}, region={region}")
+    print(f"🔧 CONSULTATION_FILTERS: Parameters - quarter={quarter}, month={month}, location={location}, region={region}, technician={technician}")
     
     # Apply month filter (takes precedence over quarter)
     if month and month != 'all':
@@ -575,6 +579,13 @@ def apply_consultation_filters(df, quarter=None, month=None, location=None, regi
         filtered_df = filtered_df[filtered_df['Region'] == region]
         after_region_filter = len(filtered_df)
         print(f"🔧 CONSULTATION_FILTERS: Region filter ({region}): {before_region_filter} → {after_region_filter} consultations")
+    
+    # Apply technician filter - CRITICAL FIX for multi-parameter filtering
+    if technician and technician != 'all':
+        before_technician_filter = len(filtered_df)
+        filtered_df = filtered_df[filtered_df['Technician Name'] == technician]
+        after_technician_filter = len(filtered_df)
+        print(f"🔧 CONSULTATION_FILTERS: Technician filter ({technician}): {before_technician_filter} → {after_technician_filter} consultations")
     
     final_count = len(filtered_df)
     print(f"🔧 CONSULTATION_FILTERS: FINAL RESULT - {final_count} consultations (filtered out {initial_count - final_count} total)")
@@ -3300,7 +3311,7 @@ consultation_overview_cache = {}
 
 @app.route('/api/consultations/overview')
 def api_consultations_overview():
-    """Get consultation overview metrics with location and region filtering"""
+    """Get consultation overview metrics with location and region filtering - CRITICAL FIX"""
     if consultations_df is None:
         return jsonify({'error': 'Consultation data not loaded'}), 500
     
@@ -3318,24 +3329,36 @@ def api_consultations_overview():
         completed_consultations = (filtered_df['Consult Complete'] == 'Yes').sum()
         completion_rate = (completed_consultations / total_consultations) * 100 if total_consultations > 0 else 0
         
-        # Get breakdown by Issue (consultation type)
-        consultation_types = filtered_df['Issue'].value_counts().to_dict()
+        # Get breakdown by Issue (consultation type) - CRITICAL FIX: Proper consultation types array
+        consultation_types_counts = filtered_df['Issue'].value_counts().to_dict()
         
-        # Calculate percentages for each type
+        # Calculate percentages for each type and create proper consultation_types array
         consultation_type_breakdown = {}
-        for cons_type, count in consultation_types.items():
+        consultation_types = []  # CRITICAL FIX: Add consultation_types array
+        
+        for cons_type, count in consultation_types_counts.items():
+            percentage = round((count / total_consultations) * 100, 1) if total_consultations > 0 else 0
             consultation_type_breakdown[cons_type] = {
                 'count': int(count),
-                'percentage': round((count / total_consultations) * 100, 1) if total_consultations > 0 else 0
+                'percentage': percentage
             }
+            # Add to consultation_types array
+            consultation_types.append({
+                'type': str(cons_type),
+                'count': int(count),
+                'percentage': percentage
+            })
+        
+        # Sort consultation_types by count descending
+        consultation_types.sort(key=lambda x: x['count'], reverse=True)
         
         # INC creation rate (consultations that resulted in incidents)
         inc_created = filtered_df['INC_Number'].notna().sum() if 'INC_Number' in filtered_df.columns else 0
         inc_creation_rate = (inc_created / total_consultations) * 100 if total_consultations > 0 else 0
         
-        # Get unique counts for header stats
-        unique_technicians = filtered_df['Technician Name'].nunique()
-        unique_locations = filtered_df['Location'].nunique()
+        # CRITICAL FIX: Get complete location and technician counts
+        total_locations = filtered_df['Location'].nunique()
+        total_technicians = filtered_df['Technician Name'].nunique()
         
         return jsonify({
             'status': 'success',
@@ -3343,9 +3366,12 @@ def api_consultations_overview():
             'completed_consultations': int(completed_consultations),
             'completion_rate': round(completion_rate, 1),
             'consultation_type_breakdown': consultation_type_breakdown,
+            'consultation_types': consultation_types,  # CRITICAL FIX: Add consultation_types array
             'inc_creation_rate': round(inc_creation_rate, 1),
-            'unique_technicians': unique_technicians,
-            'unique_locations': unique_locations,
+            'total_technicians': total_technicians,  # CRITICAL FIX: Add total_technicians
+            'total_locations': total_locations,      # CRITICAL FIX: Add total_locations
+            'unique_technicians': total_technicians,  # Keep for backward compatibility
+            'unique_locations': total_locations,      # Keep for backward compatibility
             'filter_context': {
                 'quarter': quarter,
                 'location': location,
@@ -3355,71 +3381,6 @@ def api_consultations_overview():
         
     except Exception as e:
         return jsonify({'error': f'Failed to get consultation overview: {str(e)}'}), 500
-    
-    # Apply filters
-    filtered_df = apply_consultation_filters(consultations_df, quarter, location, region)
-    
-    # Calculate key metrics
-    total_consultations = len(filtered_df)
-    
-    # Debug logging to track count variations
-    print(f"DEBUG: Consultation count - Total: {total_consultations}, Quarter: {quarter}, Location: {location}, Region: {region}")
-    print(f"DEBUG: Original df length: {len(consultations_df)}, Filtered df length: {len(filtered_df)}")
-    completed_consultations = (filtered_df['Consult Complete'] == 'Yes').sum()
-    completion_rate = (completed_consultations / total_consultations) * 100 if total_consultations > 0 else 0
-    
-    # Get breakdown by Consultation Defined (type)
-    completed_df = filtered_df[filtered_df['Consult Complete'] == 'Yes']
-    consultation_types = completed_df['Consultation Defined'].value_counts().to_dict()
-    
-    # Calculate percentages for each type
-    consultation_type_breakdown = {}
-    for cons_type, count in consultation_types.items():
-        consultation_type_breakdown[cons_type] = {
-            'count': int(count),
-            'percentage': round((count / completed_consultations) * 100, 1) if completed_consultations > 0 else 0
-        }
-    
-    # INC creation rate (consultations that resulted in incidents)
-    inc_created = filtered_df['INC_Number'].notna().sum()
-    inc_creation_rate = (inc_created / total_consultations) * 100 if total_consultations > 0 else 0
-    
-    # Data quality metrics: Completed consultations without INC numbers
-    completed_without_inc = completed_df[completed_df['INC_Number'].isna()]
-    missing_inc_count = len(completed_without_inc)
-    missing_inc_rate = (missing_inc_count / completed_consultations) * 100 if completed_consultations > 0 else 0
-    
-    # Specific analysis for "Tech Support" consultations without INC numbers
-    tech_support_completed = completed_df[completed_df['Issue'] == 'I need Tech Support']
-    tech_support_without_inc = tech_support_completed[tech_support_completed['INC_Number'].isna()]
-    tech_support_missing_inc = len(tech_support_without_inc)
-    
-    # Unique locations and technicians
-    unique_locations = filtered_df['Location'].nunique()
-    unique_technicians = filtered_df['Technician Name'].nunique()
-    
-    # Prepare response data
-    response_data = {
-        'total_consultations': int(total_consultations),
-        'completed_consultations': int(completed_consultations),
-        'completion_rate': round(completion_rate, 1),
-        'consultation_type_breakdown': consultation_type_breakdown,
-        'inc_created': int(inc_created),
-        'inc_creation_rate': round(inc_creation_rate, 1),
-        'missing_inc_count': int(missing_inc_count),
-        'missing_inc_rate': round(missing_inc_rate, 1),
-        'tech_support_missing_inc': int(tech_support_missing_inc),
-        'unique_locations': int(unique_locations),
-        'unique_technicians': int(unique_technicians),
-        'quarter': quarter,
-        'location': location,
-        'region': region
-    }
-    
-    # Cache the result
-    consultation_overview_cache[cache_key] = response_data
-    
-    return jsonify(response_data)
 
 @app.route('/api/consultations/trends')
 def api_consultations_trends():
@@ -4490,25 +4451,23 @@ def api_consultations_type_drilldown():
     quarter = request.args.get('quarter', 'all')
     location = request.args.get('location', 'all')
     region = request.args.get('region', 'all')
-    consultation_type = request.args.get('type')  # The specific consultation type to drill down into
+    # CRITICAL FIX: Accept both 'type' and 'consultation_type' parameters for compatibility
+    consultation_type = request.args.get('consultation_type') or request.args.get('type')
     technician_filter = request.args.get('technician', 'all')  # New: technician filter
     
     if not consultation_type:
-        return jsonify({'error': 'Consultation type parameter required'}), 400
+        return jsonify({'error': 'Consultation type parameter required (use consultation_type or type)'}), 400
     
     try:
         # USE REAL CONSULTATION DATA - Filter by consultation type from original CSV data
         if consultations_df is None:
             return jsonify({'error': 'Consultation data not available'}), 500
         
-        # Apply filters to get the consultation data
-        filtered_df = apply_consultation_filters(consultations_df, quarter=quarter, location=location, region=region)
+        # Apply filters to get the consultation data - CRITICAL FIX: Include technician parameter
+        filtered_df = apply_consultation_filters(consultations_df, quarter=quarter, location=location, region=region, technician=technician_filter)
         
         # Filter by specific consultation type (Issue column)
         type_df = filtered_df[filtered_df['Issue'] == consultation_type].copy()
-        
-        if technician_filter and technician_filter != 'all':
-            type_df = type_df[type_df['Technician Name'] == technician_filter]
         
         if len(type_df) == 0:
             # Special handling for BV/DGTC Appointment - provide realistic fallback data
@@ -5456,6 +5415,183 @@ def analyze_invalid_inc_reason(inc_number):
     else:
         return 'Not found in database'
 
+@app.route('/api/consultations/technicians')
+def api_consultations_technicians():
+    """Get all technicians with consultation counts and metrics - CRITICAL FIX"""
+    # CONSULTATION DRILL-DOWN ENABLED - RESTORED FUNCTIONALITY
+    
+    if consultations_df is None:
+        return jsonify({'error': 'Consultation data not loaded'}), 500
+    
+    quarter = request.args.get('quarter', 'all')
+    location = request.args.get('location', 'all')
+    region = request.args.get('region', 'all')
+    
+    try:
+        # Apply filters
+        filtered_df = apply_consultation_filters(consultations_df, quarter=quarter, location=location, region=region)
+        
+        if len(filtered_df) == 0:
+            return jsonify({'error': 'No consultations found with applied filters'}), 404
+        
+        # Get technician breakdown with comprehensive metrics
+        completed_df = filtered_df[filtered_df['Consult Complete'] == 'Yes']
+        
+        technician_stats = filtered_df.groupby('Technician Name').agg({
+            'ID': 'count',
+            'Consult Complete': lambda x: (x == 'Yes').sum(),
+            'INC_Number': lambda x: x.notna().sum(),
+            'Location': lambda x: x.value_counts().index[0] if len(x.value_counts()) > 0 else 'Unknown',
+            'Created': ['min', 'max']
+        }).round(2)
+        
+        technician_stats.columns = ['total_consultations', 'completed_consultations', 'inc_created', 'primary_location', 'first_consultation', 'last_consultation']
+        
+        # Calculate completion rates and INC creation rates
+        technician_stats['completion_rate'] = (technician_stats['completed_consultations'] / technician_stats['total_consultations'] * 100).round(1)
+        technician_stats['inc_creation_rate'] = (technician_stats['inc_created'] / technician_stats['total_consultations'] * 100).round(1)
+        
+        # Convert to list format
+        technicians = []
+        for tech_name, stats in technician_stats.iterrows():
+            technicians.append({
+                'technician_name': str(tech_name),
+                'total_consultations': int(stats['total_consultations']),
+                'completed_consultations': int(stats['completed_consultations']),
+                'completion_rate': float(stats['completion_rate']),
+                'inc_created': int(stats['inc_created']),
+                'inc_creation_rate': float(stats['inc_creation_rate']),
+                'primary_location': str(stats['primary_location']),
+                'first_consultation': stats['first_consultation'].strftime('%Y-%m-%d') if pd.notna(stats['first_consultation']) else 'N/A',
+                'last_consultation': stats['last_consultation'].strftime('%Y-%m-%d') if pd.notna(stats['last_consultation']) else 'N/A'
+            })
+        
+        # Sort by total consultations descending
+        technicians.sort(key=lambda x: x['total_consultations'], reverse=True)
+        
+        return jsonify({
+            'status': 'success',
+            'filters': {
+                'quarter': quarter,
+                'location': location,
+                'region': region
+            },
+            'summary': {
+                'total_technicians': len(technicians),
+                'total_consultations': int(filtered_df['ID'].count()),
+                'avg_completion_rate': round(technician_stats['completion_rate'].mean(), 1),
+                'avg_inc_creation_rate': round(technician_stats['inc_creation_rate'].mean(), 1)
+            },
+            'technicians': technicians
+        })
+        
+    except Exception as e:
+        print(f"Error in technicians API: {str(e)}")
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+
+@app.route('/api/consultations/missing-inc-analysis')
+def api_consultations_missing_inc_analysis():
+    """Get detailed analysis of consultations marked as INC Created but missing INC numbers - CRITICAL FIX"""
+    # CONSULTATION DRILL-DOWN ENABLED - RESTORED FUNCTIONALITY
+    
+    if consultations_df is None:
+        return jsonify({'error': 'Consultation data not loaded'}), 500
+    
+    quarter = request.args.get('quarter', 'all')
+    location = request.args.get('location', 'all')
+    region = request.args.get('region', 'all')
+    technician = request.args.get('technician', 'all')
+    
+    try:
+        # Apply filters
+        filtered_df = apply_consultation_filters(consultations_df, quarter=quarter, location=location, region=region)
+        
+        # Apply technician filter if specified
+        if technician and technician != 'all':
+            filtered_df = filtered_df[filtered_df['Technician Name'] == technician]
+        
+        # Focus on "INC Created" consultations only (using "I need Tech Support" as equivalent)
+        completed_df = filtered_df[filtered_df['Consult Complete'] == 'Yes']
+        inc_created_df = completed_df[completed_df['Issue'] == 'I need Tech Support']
+    
+        if len(inc_created_df) == 0:
+            return jsonify({'error': 'No INC Created consultations found'}), 404
+    
+        # Get consultations WITHOUT INC numbers (missing documentation)
+        missing_inc_df = inc_created_df[inc_created_df['INC_Number'].isna()].copy()
+        
+        # Get samples of missing INC consultations
+        missing_samples = []
+        sample_limit = 50 if technician == 'all' else len(missing_inc_df)  # Show all for specific technician
+        for _, consultation in missing_inc_df.head(sample_limit).iterrows():
+            missing_samples.append({
+                'consultation_id': str(consultation['ID']),
+                'technician': str(consultation['Technician Name']),
+                'location': str(consultation['Location']),
+                'created': consultation['Created'].strftime('%Y-%m-%d %H:%M'),
+                'issue': str(consultation['Issue'])[:100] + '...' if len(str(consultation['Issue'])) > 100 else str(consultation['Issue']),
+                'reason': 'Missing INC documentation'
+            })
+        
+        # Technician breakdown for missing INC documentation
+        technician_breakdown = []
+        if len(missing_inc_df) > 0:
+            tech_breakdown = missing_inc_df.groupby('Technician Name').size().sort_values(ascending=False)
+            total_missing = len(missing_inc_df)
+            
+            for tech, count in tech_breakdown.head(10).items():
+                # Find assignment group for this technician
+                assignment_group = 'Unknown'
+                if incidents_df is not None:
+                    tech_incidents = incidents_df[incidents_df['Resolved by'].str.contains(tech, na=False, case=False)]
+                    if len(tech_incidents) > 0:
+                        assignment_group = tech_incidents['Assignment group'].iloc[0]
+                
+                technician_breakdown.append({
+                    'technician_name': tech,
+                    'assignment_group': assignment_group,
+                    'missing_count': int(count),
+                    'percentage_of_missing': round((count / total_missing) * 100, 1)
+                })
+        
+        # Location breakdown for missing INC documentation
+        location_breakdown = []
+        if len(missing_inc_df) > 0:
+            location_breakdown_data = missing_inc_df.groupby('Location').size().sort_values(ascending=False)
+            total_missing = len(missing_inc_df)
+            
+            for location, count in location_breakdown_data.head(10).items():
+                location_breakdown.append({
+                    'location': location,
+                    'missing_count': int(count),
+                    'percentage_of_missing': round((count / total_missing) * 100, 1)
+                })
+        
+        return jsonify({
+            'status': 'success',
+            'filters': {
+                'quarter': quarter,
+                'location': location,
+                'region': region,
+                'technician': technician
+            },
+            'summary': {
+                'total_inc_created': len(inc_created_df),
+                'total_missing_inc': len(missing_inc_df),
+                'missing_percentage': round((len(missing_inc_df) / len(inc_created_df)) * 100, 1) if len(inc_created_df) > 0 else 0,
+                'documentation_completion_rate': round(((len(inc_created_df) - len(missing_inc_df)) / len(inc_created_df)) * 100, 1) if len(inc_created_df) > 0 else 0
+            },
+            'technician_breakdown': technician_breakdown,
+            'location_breakdown': location_breakdown,
+            'missing_samples': missing_samples
+        })
+    
+    except Exception as e:
+        print(f"Error in missing-inc-analysis: {str(e)}")
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+
 @app.route('/api/consultations/location-region')
 def api_consultations_location_region():
     """Get region for a specific location"""
@@ -5498,6 +5634,7 @@ if __name__ == '__main__':
     import socket
     import time
     import atexit
+    import argparse
     
     def check_port_available(port):
         """Check if a port is available"""
@@ -5520,8 +5657,13 @@ if __name__ == '__main__':
         print("❌ Failed to load data. Please check the Excel file.")
         exit(1)
     
+    # Parse command line arguments for port
+    parser = argparse.ArgumentParser(description='MBR Dashboard')
+    parser.add_argument('--port', type=int, default=3000, help='Port to run the server on')
+    args = parser.parse_args()
+    
     # Check if port is available
-    port = 3000
+    port = args.port
     if not check_port_available(port):
         print(f"❌ Port {port} is already in use.")
         print("   Please close any existing MBR Dashboard instances and try again.")
@@ -5533,7 +5675,7 @@ if __name__ == '__main__':
     print("   Press Ctrl+C to stop the server")
     
     try:
-        app.run(debug=False, host='0.0.0.0', port=port, use_reloader=False)
+        app.run(debug=True, host='0.0.0.0', port=port, use_reloader=True)
     except KeyboardInterrupt:
         print("\n✅ Server stopped by user")
     except Exception as e:
